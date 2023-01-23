@@ -46,6 +46,8 @@ class ListingController extends Controller
         // $listing->tags = $request->tags;
         // $listing->save();
 
-        return redirect('/');
+        Listing::create($formFields);
+
+        return redirect('/')->with('message', 'Listing created successfully!');
     }
 }
