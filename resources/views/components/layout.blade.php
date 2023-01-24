@@ -39,7 +39,7 @@
     </nav>
 
     <main>
-        {{ $slot }}}
+        {{ $slot }}
     </main>
 
     <footer
