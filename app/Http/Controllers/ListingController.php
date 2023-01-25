@@ -51,6 +51,8 @@ class ListingController extends Controller
             $formFields['logo'] = $request->file('logo')->store('logos', 'public');
         }
 
+        $formFields['user_id'] = auth()->id();
+
         Listing::create($formFields);
 
         return redirect('/')->with('message', 'Listing created successfully!');
@@ -63,6 +65,12 @@ class ListingController extends Controller
     }
 
     public function update(Request $request, Listing $listing) {
+
+        // Check if logged in user is the owner of the listing
+        if($listing->user_id !== auth()->id()){
+            return back()->with('message', 'You are not authorized to edit this listing.');
+        }
+
         $formFields = $request->validate([
             'title' => 'required',
             'company' => ['required'],
@@ -84,8 +92,20 @@ class ListingController extends Controller
     }
 
     public function destroy(Listing $listing) {
+        // Check if logged in user is the owner of the listing
+        if($listing->user_id !== auth()->id()){
+            return back()->with('message', 'You are not authorized to edit this listing.');
+        }
+
         $listing->delete();
 
         return redirect('/')->with('message', 'Listing deleted successfully!');
+    }
+
+    public function manageListings() {
+        return view('listings.manage', [
+            'listings' => Listing::where('user_id', auth()->id())->latest()->paginate(6),
+            // 'listings' => auth()->user()->listings()->latest()->paginate(6),
+        ]);
     }
 }
